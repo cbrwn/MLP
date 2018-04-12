@@ -142,6 +142,8 @@ public:
      * @return Whether or not the matrices are about equal
      */
     bool equal(Matrix& mat, float err);
+
+    void print(const char* fmt);
 private:
     // values to keep track of the size
     int m_rowCount;

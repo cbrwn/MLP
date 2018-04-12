@@ -1,5 +1,7 @@
 #include "matrix.hpp"
 
+#include <iostream>
+
 #include "gmath.h"
 
 Matrix::Matrix(int rows, int cols)
@@ -107,10 +109,25 @@ Matrix Matrix::transposed()
 Matrix Matrix::product(Matrix& mat)
 {
     // matrices must match rows/columns and columns/rows
-    if(mat.getRows() != m_colCount ||
-            mat.getColumns() != m_rowCount)
+    if(mat.getRows() != m_colCount)
+    {
+        printf("PRODUCT SIZE MISMATCH!!!\n");
         return *this;
+    }
 
+    Matrix m(m_rowCount, mat.getColumns());
+    for(int i = 0; i < m.getRows(); ++i)
+    {
+        for(int j = 0; j < m.getColumns(); ++j)
+        {
+            float sum = 0.0f;
+            for(int k = 0; k < m_colCount; ++k)
+                sum += (m_values[i][k] * mat[k][j]);
+            m[i][j] = sum;
+        }
+    }
+    return m;
+/*
     Matrix m(m_rowCount, m_rowCount);
     for(int a = 0; a < m_rowCount; ++a)
     {
@@ -123,7 +140,7 @@ Matrix Matrix::product(Matrix& mat)
         }
     }
 
-    return m;
+    return m;*/
 }
 
 void Matrix::map(ModifyFunction func)
@@ -276,4 +293,18 @@ void Matrix::randomize()
     for(int y = 0; y < m_rowCount; ++y)
         for(int x = 0; x < m_colCount; ++x)
             m_values[y][x] = randBetween(-1.0f, 1.0f);
+}
+
+void Matrix::print(const char* fmt)
+{
+    for(int y = 0; y < m_rowCount; ++y)
+    {
+        printf("[ ");
+        for(int x = 0; x < m_colCount; ++x)
+        {
+            printf(fmt, m_values[y][x]);
+        }
+        printf("]\n");
+    }
+    printf("\n");
 }
