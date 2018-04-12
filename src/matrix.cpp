@@ -1,5 +1,7 @@
 #include "matrix.hpp"
 
+#include <iostream>
+
 #include "gmath.h"
 
 Matrix::Matrix(int rows, int cols)
@@ -19,6 +21,73 @@ Matrix::~Matrix()
     for(int i = 0; i < m_rowCount; ++i)
         delete[] m_values[i];
     delete[] m_values;
+}
+
+// Copy constructor
+Matrix::Matrix(Matrix& mat)
+{
+    mat.getSize(&m_rowCount, &m_colCount);
+
+    m_values = new float*[m_rowCount];
+    for(int i = 0; i < m_rowCount; ++i)
+    {
+        m_values[i] = new float[m_colCount];
+        for(int j = 0; j < m_colCount; ++j)
+            m_values[i][j] = mat[i][j];
+    }
+}
+
+// Copy assignment operator
+Matrix& Matrix::operator=(Matrix& mat)
+{
+    mat.getSize(&m_rowCount, &m_colCount);
+
+    m_values = new float*[m_rowCount];
+    for(int i = 0; i < m_rowCount; ++i)
+    {
+        m_values[i] = new float[m_colCount];
+        for(int j = 0; j < m_colCount; ++j)
+            m_values[i][j] = mat[i][j];
+    }
+
+    return *this;
+}
+
+// Move constructor
+Matrix::Matrix(Matrix&& mat)
+{
+    mat.getSize(&m_rowCount, &m_colCount);
+
+    m_values = new float*[m_rowCount];
+    for(int i = 0; i < m_rowCount; ++i)
+    {
+        m_values[i] = new float[m_colCount];
+        for(int j = 0; j < m_colCount; ++j)
+        {
+            m_values[i][j] = mat[i][j];
+            mat[i][j] = 0.0f;
+        }
+    }
+
+}
+
+// Move assignment operator
+Matrix& Matrix::operator=(Matrix&& mat)
+{
+    mat.getSize(&m_rowCount, &m_colCount);
+
+    m_values = new float*[m_rowCount];
+    for(int i = 0; i < m_rowCount; ++i)
+    {
+        m_values[i] = new float[m_colCount];
+        for(int j = 0; j < m_colCount; ++j)
+        {
+            m_values[i][j] = mat[i][j];
+            mat[i][j] = 0.0f;
+        }
+    }
+
+    return *this;
 }
 
 float* Matrix::operator[](int index)

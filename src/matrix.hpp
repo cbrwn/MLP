@@ -11,6 +11,14 @@ public:
     Matrix(int rows, int cols);
     ~Matrix();
 
+    // copy constructors
+    Matrix(Matrix& mat);
+    Matrix& operator=(Matrix& mat);
+
+    // move constructors
+    Matrix(Matrix&& mat);
+    Matrix& operator=(Matrix&& mat);
+
     /***
      * @brief Allows indexing the matrix's values directly
      * @param index Index of the desired row
@@ -31,7 +39,8 @@ public:
      * @param rows Pointer to the location to put the row value
      * @param cols Pointer to the location to put the column value
      */
-    void getSize(int* rows, int* cols) {*rows = m_rowCount; *cols = m_colCount;}
+    void getSize(int* rows, int* cols)const
+    { *rows = m_rowCount; *cols = m_colCount;}
 
     Matrix product(Matrix& mat);
 
@@ -78,12 +87,14 @@ public:
      * @brief Multiplies this matrix by another matrix element-wise
      *          Element-wise meaning multiplying each element by its
      *          corresponding element
+     *          Other known as the Hadamard product
      * @param mat Other matrix to multiply
      * @return A matrix containing the result of the elemnt-wise multiplication
      */
     Matrix  operator* (Matrix& mat);
     /***
      * @brief Multiplies a matrix by this matrix element-wise
+     *          Otherwise known as the Hadamard product
      * @param mat Other matrix to multiply by
      * @return Reference to this which has been multiplied element-wise
      */
@@ -103,7 +114,6 @@ public:
      * @return Whether or not the matrices are about equal
      */
     bool equal(Matrix& mat, float err);
-
 private:
     // values to keep track of the size
     int m_rowCount;
