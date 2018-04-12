@@ -1,6 +1,6 @@
 #include "matrix.hpp"
 
-#include "math.h"
+#include "gmath.h"
 
 Matrix::Matrix(int rows, int cols)
         : m_rowCount(rows), m_colCount(cols)
@@ -24,6 +24,32 @@ Matrix::~Matrix()
 float* Matrix::operator[](int index)
 {
     return m_values[index];
+}
+
+Matrix Matrix::product(Matrix& mat)
+{
+    if(mat.getRows() != m_colCount ||
+            mat.getColumns() != m_rowCount)
+    {
+        return *this;
+    }
+
+    Matrix m(m_rowCount, m_rowCount);
+
+    for(int a = 0; a < m_rowCount; ++a)
+    {
+        for(int b = 0; b < m_rowCount; ++b)
+        {
+            // row A of this
+            // column B of mat
+            float sum = 0.0f;
+            for(int i = 0; i < m_colCount; ++i)
+                sum += m_values[a][i] * mat[i][b];
+            m[a][b] = sum;
+        }
+    }
+
+    return m;
 }
 
 Matrix Matrix::operator*(float mul)

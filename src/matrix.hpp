@@ -33,6 +33,8 @@ public:
      */
     void getSize(int* rows, int* cols) {*rows = m_rowCount; *cols = m_colCount;}
 
+    Matrix product(Matrix& mat);
+
     // scalar operations
     /***
      * @brief Adds a scalar value to each element of a matrix

@@ -1,6 +1,6 @@
 #include "perceptron.hpp"
 
-#include "math.h"
+#include "gmath.h"
 #include "random.h"
 
 Perceptron::Perceptron(int count)
