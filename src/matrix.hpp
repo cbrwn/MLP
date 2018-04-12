@@ -112,6 +112,18 @@ public:
      */
     Matrix& operator+=(Matrix& mat);
     /***
+     * @brief Subtracts a matrix from this matrix and returns it as a new one
+     * @param mat Other matrix to subtract from this matrix
+     * @return A matrix containing the result of the subtraction
+     */
+    Matrix  operator- (Matrix& mat);
+    /***
+     * @brief Subtracts a matrix from this matrix
+     * @param mat Other matric to subtract from this matrix
+     * @return Reference to this which has had the matrix subtracted from it
+     */
+    Matrix& operator-=(Matrix& mat);
+    /***
      * @brief Multiplies this matrix by another matrix element-wise
      *          Element-wise meaning multiplying each element by its
      *          corresponding element

@@ -221,6 +221,39 @@ Matrix& Matrix::operator+=(Matrix& mat)
     return *this;
 }
 
+Matrix Matrix::operator-(Matrix& mat)
+{
+    if(mat.getRows() != m_rowCount
+       || mat.getColumns() != m_colCount)
+    {
+        // columns and rows don't match
+        return *this;
+    }
+
+    Matrix m(m_rowCount, m_colCount);
+    for(int y = 0; y < m_rowCount; ++y)
+        for(int x = 0; x < m_colCount; ++x)
+            m[y][x] = m_values[y][x] - mat[y][x];
+
+    return m;
+}
+
+Matrix& Matrix::operator-=(Matrix& mat)
+{
+    if(mat.getRows() != m_rowCount
+       || mat.getColumns() != m_colCount)
+    {
+        // columns and rows don't match
+        return *this;
+    }
+
+    for(int y = 0; y < m_rowCount; ++y)
+        for(int x = 0; x < m_colCount; ++x)
+            m_values[y][x] -= mat[y][x];
+
+    return *this;
+}
+
 Matrix Matrix::operator*(Matrix& mat)
 {
     if(mat.getRows() != m_rowCount
