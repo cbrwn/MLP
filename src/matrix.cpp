@@ -270,3 +270,10 @@ bool Matrix::equal(Matrix& mat, float err)
 
     return true;
 }
+
+void Matrix::randomize()
+{
+    for(int y = 0; y < m_rowCount; ++y)
+        for(int x = 0; x < m_colCount; ++x)
+            m_values[y][x] = randBetween(-1.0f, 1.0f);
+}

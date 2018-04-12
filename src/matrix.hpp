@@ -67,6 +67,11 @@ public:
      */
     void map(ModifyFunction func);
 
+    /***
+     * @brief Gives each element in the matrix a random value between -1 and 1
+     */
+    void randomize();
+
     // scalar operations
     /***
      * @brief Adds a scalar value to each element of a matrix
