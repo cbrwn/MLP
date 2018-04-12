@@ -1,0 +1,6 @@
+dependencies
+cmake-build-debug
+bootstrap
+bin
+CMakeLists.txt
+.idea

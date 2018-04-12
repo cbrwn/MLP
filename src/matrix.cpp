@@ -184,7 +184,7 @@ bool Matrix::equal(Matrix& mat, float err)
 
     for(int y = 0; y < m_rowCount; ++y)
         for(int x = 0; x < m_colCount; ++x)
-            if(abs(m_values[y][x] - mat[y][x]) > err)
+            if(absf(m_values[y][x] - mat[y][x]) > err)
                 return false;
 
     return true;
