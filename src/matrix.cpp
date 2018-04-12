@@ -99,6 +99,7 @@ float* Matrix::operator[](int index)
 
 Matrix Matrix::transposed()
 {
+    // transposing is just switching the columns and rows
     Matrix m(m_colCount, m_rowCount);
     for(int y = 0; y < m_rowCount; ++y)
         for(int x = 0; x < m_colCount; ++x)
@@ -108,7 +109,7 @@ Matrix Matrix::transposed()
 
 Matrix Matrix::product(Matrix& mat)
 {
-    // matrices must match rows/columns and columns/rows
+    // matrices must match columns/rows
     if(mat.getRows() != m_colCount)
     {
         printf("PRODUCT SIZE MISMATCH!!!\n");
@@ -127,20 +128,6 @@ Matrix Matrix::product(Matrix& mat)
         }
     }
     return m;
-/*
-    Matrix m(m_rowCount, m_rowCount);
-    for(int a = 0; a < m_rowCount; ++a)
-    {
-        for(int b = 0; b < m_rowCount; ++b)
-        {
-            float sum = 0.0f;
-            for(int i = 0; i < m_colCount; ++i)
-                sum += m_values[a][i] * mat[i][b];
-            m[a][b] = sum;
-        }
-    }
-
-    return m;*/
 }
 
 void Matrix::map(ModifyFunction func)
@@ -334,9 +321,7 @@ void Matrix::print(const char* fmt)
     {
         printf("[ ");
         for(int x = 0; x < m_colCount; ++x)
-        {
             printf(fmt, m_values[y][x]);
-        }
         printf("]\n");
     }
     printf("\n");

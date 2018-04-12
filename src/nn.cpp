@@ -1,14 +1,12 @@
 #include "nn.hpp"
 
 #include <cmath>
-#include <iostream>
 
 #include "matrix.hpp"
 
 NeuralNetwork::NeuralNetwork(int in, int hid, int out)
     : m_inputNodes(in), m_hiddenNodes(hid), m_outputNodes(out)
 {
-
     m_inputWeights = new Matrix(hid, in);
     m_hiddenWeights = new Matrix(out, hid);
 
@@ -59,7 +57,7 @@ float* NeuralNetwork::feedForward(Matrix& input)
     return result;
 }
 
-float* NeuralNetwork::guess(float* input)
+float* NeuralNetwork::guess(float const* input)
 {
     // make a matrix from this array
     Matrix m(m_inputNodes, 1);
@@ -70,7 +68,7 @@ float* NeuralNetwork::guess(float* input)
     return feedForward(m);
 }
 
-void NeuralNetwork::teach(float* inputs, float* targets)
+void NeuralNetwork::teach(float const* inputs, float const* targets)
 {
     // turn targets into a matrix
     Matrix targetMatrix(m_outputNodes, 1);
@@ -85,13 +83,13 @@ void NeuralNetwork::teach(float* inputs, float* targets)
     // grab the current output of the input
     // not just calling guess because we want to keep track of
     // the matrices along the way
-    auto hiddenLayer = m_inputWeights->product(inputMatrix);
+    Matrix hiddenLayer = m_inputWeights->product(inputMatrix);
     hiddenLayer += *m_inputBias;
     // apply activation function
     hiddenLayer.map(&sigmoid);
 
     // get outputs for output nodes
-    auto outputLayer = m_hiddenWeights->product(hiddenLayer);
+    Matrix outputLayer = m_hiddenWeights->product(hiddenLayer);
     outputLayer += *m_hiddenBias;
     // apply activation function
     outputLayer.map(&sigmoid);
@@ -112,8 +110,8 @@ void NeuralNetwork::teach(float* inputs, float* targets)
 
     // get the deltas to adjust the weights
     Matrix hiddenLayerT = hiddenLayer.transposed();
-    outputGradient = outputGradient.product(hiddenLayerT);
-    (*m_hiddenWeights) += outputGradient;
+    Matrix hiddenDelta = outputGradient.product(hiddenLayerT);
+    (*m_hiddenWeights) += hiddenDelta;
 
     // grab hidden layer error
     Matrix hiddenTrans = m_hiddenWeights->transposed();
@@ -130,8 +128,8 @@ void NeuralNetwork::teach(float* inputs, float* targets)
 
     // get the deltas for these weights
     Matrix inputLayerT = inputMatrix.transposed();
-    hiddenGradient = hiddenGradient.product(inputLayerT);
-    (*m_inputWeights) += hiddenGradient;
+    Matrix inputDelta = hiddenGradient.product(inputLayerT);
+    (*m_inputWeights) += inputDelta;
 }
 
 float sigmoid(float x)
