@@ -1,13 +1,13 @@
 #include "matrix.hpp"
 
-#include <iostream>
-
 #include "gmath.h"
 
 Matrix::Matrix(int rows, int cols)
         : m_rowCount(rows), m_colCount(cols)
 {
     m_values = new float*[rows];
+
+    // initialize all elements to 0
     for(int i = 0; i < rows; ++i)
     {
         m_values[i] = new float[cols];
@@ -95,22 +95,27 @@ float* Matrix::operator[](int index)
     return m_values[index];
 }
 
+Matrix Matrix::transposed()
+{
+    Matrix m(m_colCount, m_rowCount);
+    for(int y = 0; y < m_rowCount; ++y)
+        for(int x = 0; x < m_colCount; ++x)
+            m[x][y] = m_values[y][x];
+    return m;
+}
+
 Matrix Matrix::product(Matrix& mat)
 {
+    // matrices must match rows/columns and columns/rows
     if(mat.getRows() != m_colCount ||
             mat.getColumns() != m_rowCount)
-    {
         return *this;
-    }
 
     Matrix m(m_rowCount, m_rowCount);
-
     for(int a = 0; a < m_rowCount; ++a)
     {
         for(int b = 0; b < m_rowCount; ++b)
         {
-            // row A of this
-            // column B of mat
             float sum = 0.0f;
             for(int i = 0; i < m_colCount; ++i)
                 sum += m_values[a][i] * mat[i][b];
@@ -119,6 +124,13 @@ Matrix Matrix::product(Matrix& mat)
     }
 
     return m;
+}
+
+void Matrix::map(ModifyFunction func)
+{
+    for(int y = 0; y < m_rowCount; ++y)
+        for(int x = 0; x < m_colCount; ++x)
+            m_values[y][x] = func(m_values[y][x]);
 }
 
 Matrix Matrix::operator*(float mul)

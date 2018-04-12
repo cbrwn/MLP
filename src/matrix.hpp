@@ -1,5 +1,8 @@
 #pragma once
 
+// typedef a function pointer we'll be using in the map function
+typedef float(*ModifyFunction)(float n);
+
 class Matrix
 {
 public:
@@ -42,7 +45,27 @@ public:
     void getSize(int* rows, int* cols)const
     { *rows = m_rowCount; *cols = m_colCount;}
 
+    /***
+     * @brief Returns a new matrix which is this matrix transposed
+     *          Meaning the rows are now the columns and the columns
+     *          are now the rows
+     * @return This matrix but transposed
+     */
+    Matrix transposed();
+
+    /***
+     * @brief Gets the dot product(? - or just called multiplication) of this
+     *          matrix and another matrix
+     * @param mat Other matrix to get the product of
+     * @return A new matrix containing the product of the multiplication
+     */
     Matrix product(Matrix& mat);
+
+    /***
+     * @brief Applies a function to each value in the matrix
+     * @param func Pointer to the function to apply
+     */
+    void map(ModifyFunction func);
 
     // scalar operations
     /***
