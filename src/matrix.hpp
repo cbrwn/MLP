@@ -156,11 +156,6 @@ public:
      */
     bool equal(Matrix& mat, float err);
 
-    /***
-     * @brief Prints the contents of the matrix
-     * @param fmt Format to use on the numbers
-     */
-    void print(const char* fmt);
 private:
     // values to keep track of the size
     int m_rowCount;

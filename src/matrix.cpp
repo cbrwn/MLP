@@ -1,7 +1,5 @@
 #include "matrix.hpp"
 
-#include <iostream>
-
 #include "gmath.h"
 
 Matrix::Matrix(int rows, int cols)
@@ -111,10 +109,7 @@ Matrix Matrix::product(Matrix& mat)
 {
     // matrices must match columns/rows
     if(mat.getRows() != m_colCount)
-    {
-        printf("PRODUCT SIZE MISMATCH!!!\n");
         return *this;
-    }
 
     Matrix m(m_rowCount, mat.getColumns());
     for(int i = 0; i < m.getRows(); ++i)
@@ -315,18 +310,7 @@ void Matrix::randomize()
             m_values[y][x] = randBetween(-1.0f, 1.0f);
 }
 
-void Matrix::print(const char* fmt)
-{
-    for(int y = 0; y < m_rowCount; ++y)
-    {
-        printf("[ ");
-        for(int x = 0; x < m_colCount; ++x)
-            printf(fmt, m_values[y][x]);
-        printf("]\n");
-    }
-    printf("\n");
-}
-
+// default constructor which should never be used
 Matrix::Matrix()
 {
     m_rowCount = 1;

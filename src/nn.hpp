@@ -18,13 +18,14 @@ float isigmoid(float n);
 class NeuralNetwork {
 public:
     /***
-     * @brief Creates a neural network with a specified number of inputs,
-     *          hidden nodes and outputs
+     * @brief Creates a neural network with a set amount of input nodes,
+     *          output nodes, hidden layers, and nodes in each hidden layer
      * @param in Number of inputs
-     * @param hid Number of nodes in the hidden layer
+     * @param hid Number of hidden layers
+     * @param nodes Array representing how many nodes in each hidden layer
      * @param out Number of outputs
      */
-    NeuralNetwork(int in, int hid, int out);
+    NeuralNetwork(int in, int hid, int* nodes, int out);
     ~NeuralNetwork();
 
     /***
@@ -33,12 +34,6 @@ public:
      * @return Array of floats containing the outputs
      */
     float* guess(float const* input);
-    /***
-     * @brief Takes a Matrix and uses the feed forward algorithm to get a result
-     * @param input Matrix of inputs
-     * @return Array of floats containing the outputs
-     */
-    float* feedForward(Matrix& input);
 
     /***
      * @brief Takes a single set of inputs and targets and uses these to
@@ -46,33 +41,23 @@ public:
      * @param inputs Inputs which should result in targets
      * @param targets Desired output from inputs
      */
-    void teach(float const* inputs, float const* targets);
+    void propagate(float const* inputs, float const* targets);
 
     // learning rate getter/setter
     float getLearningRate() { return m_learningRate; }
     void setLearningRate(float rate) { m_learningRate = rate; }
 
-    Matrix* getInputWeights() { return m_inputWeights; }
-    Matrix* getHiddenWeights() { return m_hiddenWeights; }
-    Matrix* getInputBias() { return m_inputBias; }
-    Matrix* getHiddenBias() { return m_hiddenBias; }
-
-    int getHiddenNodes() { return m_hiddenNodes; }
-
 private:
-    // numbers of nodes
     int m_inputNodes;
-    int m_hiddenNodes;
     int m_outputNodes;
+
+    int m_hiddenLayers;
+    int* m_hiddenNodeCount;
 
     // how the weight changes are scaled
     float m_learningRate;
 
-    // weights
-    Matrix* m_inputWeights;
-    Matrix* m_hiddenWeights;
-
-    // biases
-    Matrix* m_inputBias;
-    Matrix* m_hiddenBias;
+    // arrays to matrix pointers where these values are stored
+    Matrix** m_weights;
+    Matrix** m_biases;
 };
