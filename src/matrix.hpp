@@ -12,6 +12,7 @@ public:
      * @param cols Number of columns
      */
     Matrix(int rows, int cols);
+    Matrix();
     ~Matrix();
 
     // copy constructors

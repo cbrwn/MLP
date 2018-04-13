@@ -326,3 +326,10 @@ void Matrix::print(const char* fmt)
     }
     printf("\n");
 }
+
+Matrix::Matrix()
+{
+    m_rowCount = 1;
+    m_colCount = 1;
+
+}
