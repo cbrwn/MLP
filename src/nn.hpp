@@ -52,6 +52,13 @@ public:
     float getLearningRate() { return m_learningRate; }
     void setLearningRate(float rate) { m_learningRate = rate; }
 
+    Matrix* getInputWeights() { return m_inputWeights; }
+    Matrix* getHiddenWeights() { return m_hiddenWeights; }
+    Matrix* getInputBias() { return m_inputBias; }
+    Matrix* getHiddenBias() { return m_hiddenBias; }
+
+    int getHiddenNodes() { return m_hiddenNodes; }
+
 private:
     // numbers of nodes
     int m_inputNodes;
