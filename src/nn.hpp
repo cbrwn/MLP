@@ -25,7 +25,7 @@ public:
      * @param nodes Array representing how many nodes in each hidden layer
      * @param out Number of outputs
      */
-    NeuralNetwork(int in, int hid, int* nodes, int out);
+    NeuralNetwork(int in, int hid, int const* nodes, int out);
     ~NeuralNetwork();
 
     /***
