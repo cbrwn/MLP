@@ -1,5 +1,8 @@
 #pragma once
 
+#define NN_FILE_ID_SIZE 8
+#define NN_FILE_ID { 'b', 'a', 'd', 'm', 'l', 'p', 'n', 'n' }
+
 class Matrix;
 
 /***
@@ -42,6 +45,19 @@ public:
      * @param targets Desired output from inputs
      */
     void propagate(float const* inputs, float const* targets);
+
+    /***
+     * @brief Saves this network to a file
+     * @param filename File to save to
+     * @return Whether or not saving was successful
+     */
+    bool save(const char* filename);
+    /***
+     * @brief Loads a network from a file and returns it as a new NeuralNetwork
+     * @param filename File to load from
+     * @return The resulting network, or nullptr if it was unsuccessful
+     */
+    static NeuralNetwork* load(const char* filename);
 
     // learning rate getter/setter
     float getLearningRate() { return m_learningRate; }

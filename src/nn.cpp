@@ -1,6 +1,7 @@
 #include "nn.hpp"
 
 #include <cmath>
+#include <fstream>
 
 #include "matrix.hpp"
 
@@ -163,6 +164,196 @@ void NeuralNetwork::propagate(float const* inputs, float const* targets)
     delete[] allLayers;
     delete targetMatrix;
     delete inputMatrix;
+}
+
+bool NeuralNetwork::save(const char* filename)
+{
+    /*
+     * Format of file:
+     *
+     * 8 bytes - identifying the file
+     *
+     * 4 bytes - input nodes
+     * 4 bytes - output nodes
+     *
+     * 4 bytes - learning rate
+     *
+     * 4 bytes - number of hidden layers
+     * n * 4 bytes - number of neurons in each hidden layer
+     *
+     * 4 bytes - number of matrices (hidden layers+1)
+     * however many bytes - all weights
+     * however many bytes - all biases
+     */
+    std::fstream file;
+    file.open(filename, std::ios::out | std::ios::binary);
+
+    if(!file.is_open())
+        return false;
+
+    // stick the ID values into a char array
+    char fileId[] = NN_FILE_ID;
+
+    // write file ID
+    file.write(fileId, NN_FILE_ID_SIZE);
+
+    // write input/output node numbers
+    file.write((char*)&m_inputNodes, 4);
+    file.write((char*)&m_outputNodes, 4);
+
+    // write learning rate
+    file.write((char*)&m_learningRate, 4);
+
+    // write number of hidden layers
+    file.write((char*)&m_hiddenLayers, 4);
+    // write number of hidden layer neurons
+    for(int i = 0; i < m_hiddenLayers; ++i)
+        file.write((char*)&m_hiddenNodeCount[i], 4);
+
+    // now we can start writing matrix data
+
+    // write the number of matrices, will always be hiddenLayers+1
+    int matrixCount = m_hiddenLayers+1;
+    file.write((char*)&matrixCount, 4);
+
+    // write weight matrices
+    for(int i = 0; i < matrixCount; ++i)
+    {
+        Matrix* m = m_weights[i];
+
+        int rows = m->getRows();
+        int cols = m->getColumns();
+
+        // write the actual values
+        for(int y = 0; y < rows; ++y)
+        {
+            for(int x = 0; x < cols; ++x)
+            {
+                float val = (*m)[y][x];
+
+                file.write((char*)&val, 4);
+            }
+        }
+    }
+
+    // write bias matrices
+    for(int i = 0; i < matrixCount; ++i)
+    {
+        Matrix* m = m_biases[i];
+
+        int rows = m->getRows();
+        int cols = m->getColumns();
+
+        // write the actual values
+        for(int y = 0; y < rows; ++y)
+        {
+            for(int x = 0; x < cols; ++x)
+            {
+                float val = (*m)[y][x];
+
+                file.write((char*)&val, 4);
+            }
+        }
+    }
+
+    return true;
+}
+
+NeuralNetwork* NeuralNetwork::load(const char* filename)
+{
+    std::fstream file;
+    file.open(filename, std::ios::in | std::ios::binary);
+
+    if(!file.is_open())
+        return nullptr;
+
+    char fileId[NN_FILE_ID_SIZE+1];
+    char expectedId[] = NN_FILE_ID;
+
+    // check 'header' to make sure we're opening a valid file
+    file.read(fileId, NN_FILE_ID_SIZE);
+    for(int i = 0; i < NN_FILE_ID_SIZE; ++i)
+        if(fileId[i] != expectedId[i])
+            return nullptr;
+
+    int input;
+    int output;
+    int hLayers;
+    float learningRate;
+
+    // get input nodes
+    file.read((char*)&input, 4);
+    // and output nodes
+    file.read((char*)&output, 4);
+
+    // get learning rate
+    file.read((char*)&learningRate, 4);
+
+    // get number of hidden layers
+    file.read((char*)&hLayers, 4);
+
+    // get the node count for each hidden layer
+    auto hNodes = new int[hLayers];
+    for(int i = 0; i < hLayers; ++i)
+    {
+        int read;
+        file.read((char*)&read, 4);
+        hNodes[i] = read;
+    }
+
+    // we can make our NN object now
+    auto result = new NeuralNetwork(input, hLayers, hNodes, output);
+    result->setLearningRate(learningRate);
+
+    // and delete that dynamically allocated array
+    delete[] hNodes;
+
+    // get number of matrices
+    int matrixCount;
+    file.read((char*)&matrixCount, 4);
+
+    // read weight matrices
+    for(int i = 0; i < matrixCount; ++i)
+    {
+        // why can I access this private member???
+        Matrix* m = result->m_weights[i];
+
+        int rows = m->getRows();
+        int cols = m->getColumns();
+
+        for(int y = 0; y < rows; ++y)
+        {
+            for(int x = 0; x < cols; ++x)
+            {
+                float val;
+                file.read((char*)&val, 4);
+
+                (*m)[y][x] = val;
+            }
+        }
+    }
+
+    // read bias matrices
+    for(int i = 0; i < matrixCount; ++i)
+    {
+        Matrix* m = result->m_biases[i];
+
+        int rows = m->getRows();
+        int cols = m->getColumns();
+
+        for(int y = 0; y < rows; ++y)
+        {
+            for(int x = 0; x < cols; ++x)
+            {
+                float val;
+                file.read((char*)&val, 4);
+
+                (*m)[y][x] = val;
+            }
+        }
+    }
+
+    return result;
 }
 
 float sigmoid(float x)
