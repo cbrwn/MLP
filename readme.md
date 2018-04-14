@@ -11,14 +11,15 @@ It's a feed forward network which uses backpropagation to 'learn' - using superv
 It has only really been tested by learning to solve XOR but I plan on having it do the classic handwritten digit recognition thing and also have it learn to play some games
 
 Resources I used to make this:
-    - Coding Train
 
-        - [Neural Networks YouTube playlist](https://www.youtube.com/playlist?list=PLRqwX-V7Uu6aCibgK1PTWWu9by6XFdCfh)
+* [Coding Train](https://www.youtube.com/channel/UCvjgXvBlbQiydffZU7m1_aw)
 
-        - [Toy-Neural-Network-JS repo](https://github.com/CodingTrain/Toy-Neural-Network-JS)
+    - [Neural Networks YouTube playlist](https://www.youtube.com/playlist?list=PLRqwX-V7Uu6aCibgK1PTWWu9by6XFdCfh)
 
-    - [3Blue1Brown](https://www.youtube.com/channel/UCYO_jab_esuFRV4b17AJtAw)
+    - [Toy-Neural-Network-JS repo](https://github.com/CodingTrain/Toy-Neural-Network-JS)
 
-        - [Neural networks YouTube playlist](https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi)
+- [3Blue1Brown](https://www.youtube.com/channel/UCYO_jab_esuFRV4b17AJtAw)
 
-        - [Essence of linear algebra YouTube playlist](https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab)
+    - [Neural networks YouTube playlist](https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi)
+
+    - [Essence of linear algebra YouTube playlist](https://www.youtube.com/playlist?list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab)
