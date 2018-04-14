@@ -58,7 +58,7 @@ NeuralNetwork::~NeuralNetwork()
     delete[] m_hiddenNodeCount;
 }
 
-float* NeuralNetwork::guess(float const* input)
+void NeuralNetwork::guess(float const* input, float* output)
 {
     // make a matrix from the input
     auto lastLayer = new Matrix(m_inputNodes, 1);
@@ -76,13 +76,10 @@ float* NeuralNetwork::guess(float const* input)
     }
 
     // turn output into float array
-    auto result = new float[m_outputNodes];
     for(int i = 0; i < m_outputNodes; ++i)
-        result[i] = (*lastLayer)[i][0];
+        output[i] = (*lastLayer)[i][0];
 
     delete lastLayer;
-
-    return result;
 }
 
 void NeuralNetwork::propagate(float const* inputs, float const* targets)

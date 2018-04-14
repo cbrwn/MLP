@@ -33,7 +33,7 @@ public:
      * @param input Inputs to use to get the result
      * @return Array of floats containing the outputs
      */
-    float* guess(float const* input);
+    void guess(float const* input, float* output);
 
     /***
      * @brief Takes a single set of inputs and targets and uses these to
