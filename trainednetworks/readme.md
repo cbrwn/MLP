@@ -6,4 +6,4 @@ these should work with NeuralNetwork::load() function
 
 ## XOR Network
 
-takes in 2 inputs, should both be either 1 or 0, and it'll give one result which is its certainty that the result of the XOR operation is a 1
+takes in 2 inputs, should both be either 1 or -1, and it'll give one result where -1 represents a 0 result and 1 represents a 1 result
