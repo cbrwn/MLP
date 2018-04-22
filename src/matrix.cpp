@@ -20,7 +20,8 @@ Matrix::~Matrix()
 {
     for (int i = 0; i < m_rowCount; ++i)
         delete[] m_values[i];
-    delete[] m_values;
+    if (m_rowCount > 0)
+        delete[] m_values;
 }
 
 // Copy constructor
@@ -40,6 +41,11 @@ Matrix::Matrix(Matrix& mat)
 // Copy assignment operator
 Matrix& Matrix::operator=(Matrix const& mat)
 {
+    for (int i = 0; i < m_rowCount; ++i)
+        delete[] m_values[i];
+    if (m_rowCount > 0)
+        delete[] m_values;
+
     mat.getSize(&m_rowCount, &m_colCount);
 
     float** matVals = mat._getArray();
@@ -76,6 +82,11 @@ Matrix::Matrix(Matrix&& mat) noexcept
 // Move assignment operator
 Matrix& Matrix::operator=(Matrix&& mat) noexcept
 {
+    for (int i = 0; i < m_rowCount; ++i)
+        delete[] m_values[i];
+    if (m_rowCount > 0)
+        delete[] m_values;
+
     mat.getSize(&m_rowCount, &m_colCount);
 
     m_values = new float* [m_rowCount];
@@ -315,8 +326,8 @@ void Matrix::randomize()
 // default constructor which should never be used
 Matrix::Matrix()
 {
-    m_rowCount = 1;
-    m_colCount = 1;
+    m_rowCount = -1;
+    m_colCount = -1;
 }
 
 void Matrix::mutate(float rate)

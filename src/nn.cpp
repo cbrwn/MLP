@@ -1,5 +1,6 @@
 #include "nn.hpp"
 
+#include <iostream>
 #include <cmath>
 #include <fstream>
 
@@ -66,104 +67,90 @@ NeuralNetwork::~NeuralNetwork()
 void NeuralNetwork::guess(float const* input, float* output)
 {
     // make a matrix from the input
-    auto lastLayer = new Matrix(m_inputNodes, 1);
+    //auto lastLayer = new Matrix(m_inputNodes, 1);
+    Matrix lastLayer = Matrix(m_inputNodes, 1);
     for(int i = 0; i < m_inputNodes; ++i)
-        (*lastLayer)[i][0] = input[i];
+        lastLayer[i][0] = input[i];
 
     for(int i = 0; i < m_hiddenLayers+1; ++i)
     {
         // take the input to these neurons and multiply them by the weights
-        auto layer = m_weights[i]->product(*lastLayer);
+        auto layer = m_weights[i]->product(lastLayer);
         // add biases separately, could also just be another weight
         layer += *(m_biases[i]);
         // scale between 0 and 1 using activation function
-        layer.map(&sigmoid);
+        layer.map(&activtan);
 
-        delete lastLayer;
-        lastLayer = new Matrix(layer);
+        lastLayer = layer;
     }
     // now lastLayer is the matrix representing the output
 
     // turn output into float array
     for(int i = 0; i < m_outputNodes; ++i)
-        output[i] = (*lastLayer)[i][0];
-
-    delete lastLayer;
+        output[i] = lastLayer[i][0];
 }
 
 void NeuralNetwork::propagate(float const* inputs, float const* targets)
 {
     // turn the inputs and targets into 1 column matrices
-    auto inputMatrix = new Matrix(m_inputNodes, 1);
-    auto targetMatrix = new Matrix(m_outputNodes, 1);
+    Matrix inputMatrix(m_inputNodes, 1);
+    Matrix targetMatrix(m_outputNodes, 1);
 
     for(int i = 0; i < m_inputNodes; ++i)
-        (*inputMatrix)[i][0] = inputs[i];
+        inputMatrix[i][0] = inputs[i];
     for(int i = 0; i < m_outputNodes; ++i)
-        (*targetMatrix)[i][0] = targets[i];
+        targetMatrix[i][0] = targets[i];
 
     // get the results of each layer
     // just feedforward (like the guess function) but keep track of layers
     // I should probably put this feedforward stuff into a function and
     //  use that for both this and guessing
-    auto allLayers = new Matrix*[m_hiddenLayers+1];
-    auto lastLayer = new Matrix(*inputMatrix);
+    Matrix allLayers[m_hiddenLayers+1];
+    Matrix lastLayer = inputMatrix;
     for(int i = 0; i < m_hiddenLayers+1; ++i)
     {
-        auto layer = m_weights[i]->product(*lastLayer);
+        auto layer = m_weights[i]->product(lastLayer);
         layer += *(m_biases[i]);
-        layer.map(&sigmoid);
+        layer.map(&activtan);
 
-        if(i == 0)
-            delete lastLayer;
-        lastLayer = new Matrix(layer);
+        lastLayer = layer;
         allLayers[i] = lastLayer;
     }
 
     // actual backpropagation part
-    auto error = new Matrix(*targetMatrix - *(allLayers[m_hiddenLayers]));
+    Matrix error = targetMatrix - allLayers[m_hiddenLayers];
     for(int i = m_hiddenLayers; i >= 0; --i)
     {
         // get the gradient - the derivative of the results of this layer
-        auto gradient = new Matrix(*allLayers[i]);
-        gradient->map(&isigmoid);
+        Matrix gradient = allLayers[i];
+        gradient.map(&derivtan);
         // adjust based on the difference between the target and the result
-        (*gradient) *= *error;
+        gradient *= error;
         // and adjust for our learning rate
-        (*gradient) *= m_learningRate;
+        gradient *= m_learningRate;
 
         // adjust bias with this value before calculating the weight delta
-        (*m_biases[i]) += (*gradient);
+        (*m_biases[i]) += gradient;
 
-        Matrix* pLayer; // previous layer
+        Matrix pLayer; // previous layer
         if(i == 0)
             pLayer = inputMatrix;
         else
             pLayer = allLayers[i-1];
         // transpose to get it in the correct layout to multiply
-        Matrix pTrans = pLayer->transposed();
+        Matrix pTrans = pLayer.transposed();
         // multiply the last layer's results by the gradient to get the
         //  amount we should adjust the weights by
-        Matrix wDelta = gradient->product(pTrans);
+        Matrix wDelta = gradient.product(pTrans);
 
         // adjust the weights!
         (*m_weights[i]) += wDelta;
 
         Matrix weightTrans = m_weights[i]->transposed();
-        Matrix* m = error; // save this here to delete it after reassigning
+        Matrix m = error; // save this here to delete it after reassigning
         // base the next layer's error on this layer's error
-        error = new Matrix(weightTrans.product(*error));
-        delete m;
-        delete gradient;
+        error = weightTrans.product(error);
     }
-    delete error;
-
-    // delete everything
-    for(int i = 0; i < m_hiddenLayers+1; ++i)
-        delete allLayers[i];
-    delete[] allLayers;
-    delete targetMatrix;
-    delete inputMatrix;
 }
 
 bool NeuralNetwork::save(const char* filename)
@@ -328,9 +315,13 @@ NeuralNetwork* NeuralNetwork::load(const char* filename)
                 float val;
                 file.read((char*)&val, 4);
 
+                printf("%.2f, ", val);
+
                 (*m)[y][x] = val;
             }
+            printf("\n");
         }
+        printf("\n");
     }
 
     // read bias matrices
@@ -356,6 +347,41 @@ NeuralNetwork* NeuralNetwork::load(const char* filename)
     return result;
 }
 
+NeuralNetwork* NeuralNetwork::copy()
+{
+    auto result = new NeuralNetwork(m_inputNodes, m_hiddenLayers,
+                                    m_hiddenNodeCount, m_outputNodes);
+
+    result->setLearningRate(this->getLearningRate());
+
+    // copy matrices
+    for(int i = 0; i < m_hiddenLayers+1; ++i)
+    {
+        delete result->m_weights[i];
+        result->m_weights[i] = new Matrix(*m_weights[i]);
+        delete result->m_biases[i];
+        result->m_biases[i] = new Matrix(*m_weights[i]);
+    }
+
+    return result;
+}
+
+void NeuralNetwork::mutate(float rate)
+{
+    for(int i = 0; i < m_hiddenLayers+1; ++i)
+    {
+        m_weights[i]->mutate(rate);
+        m_biases[i]->mutate(rate);
+    }
+}
+
+void NeuralNetwork::breed(NeuralNetwork* other)
+{
+    for(int i = 0; i < m_hiddenLayers+1; ++i)
+    {
+    }
+}
+
 float sigmoid(float x)
 {
     float ex = expf(x);
@@ -367,4 +393,14 @@ float sigmoid(float x)
 float isigmoid(float n)
 {
     return n * (1 - n);
+}
+
+float activtan(float x)
+{
+    return tanhf(x);
+}
+
+float derivtan(float x)
+{
+    return 1 - (x*x);
 }

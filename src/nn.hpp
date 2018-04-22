@@ -18,6 +18,20 @@ float sigmoid(float x);
  */
 float isigmoid(float n);
 
+/***
+ * @brief tanh activation function - between -1 and 1
+ * @param x Value to normalize
+ * @return Normalized value between -1 and 1
+ */
+float activtan(float x);
+/***
+ * @brief Inverse of tanh activation function, assuming the number was already
+ *          passed into tanh
+ * @param x Normalized value
+ * @return Result of the derivative function
+ */
+float derivtan(float x);
+
 class NeuralNetwork {
 public:
     /***
@@ -45,6 +59,13 @@ public:
      * @param targets Desired output from inputs
      */
     void propagate(float const* inputs, float const* targets);
+
+    // stuff for neuroevolution
+    // not finished
+    NeuralNetwork* copy();
+    void mutate(float rate);
+    // not implemented at all
+    void breed(NeuralNetwork* other);
 
     /***
      * @brief Saves this network to a file

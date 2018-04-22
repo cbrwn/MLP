@@ -4,7 +4,7 @@ This is a simple multilayer perceptron neural network class thing
 
 I wrote everything from scratch with a VERY BASIC understanding of neural networks, so nothing about this is optimized or efficient or well done
 
-It has the ability to accept any number of inputs, have any number of hidden layers with any number of neurons for each, and produce any number of outputs. It uses sigmoid as the activation function and is very slow because I implemented my matrix class super badly
+It has the ability to accept any number of inputs, have any number of hidden layers with any number of neurons for each, and produce any number of outputs. It uses tanh (or sigmoid if you want) as the activation function and is very slow because I implemented my matrix class super badly
 
 It's a feed forward network which uses backpropagation to 'learn' - using supervsed learning or possibly reinforcement learning
 
