@@ -5,20 +5,20 @@
 Matrix::Matrix(int rows, int cols)
         : m_rowCount(rows), m_colCount(cols)
 {
-    m_values = new float*[rows];
+    m_values = new float* [rows];
 
     // initialize all elements to 0
-    for(int i = 0; i < rows; ++i)
+    for (int i = 0; i < rows; ++i)
     {
         m_values[i] = new float[cols];
-        for(int j = 0; j < cols; ++j)
+        for (int j = 0; j < cols; ++j)
             m_values[i][j] = 0.0f;
     }
 }
 
 Matrix::~Matrix()
 {
-    for(int i = 0; i < m_rowCount; ++i)
+    for (int i = 0; i < m_rowCount; ++i)
         delete[] m_values[i];
     delete[] m_values;
 }
@@ -28,41 +28,43 @@ Matrix::Matrix(Matrix& mat)
 {
     mat.getSize(&m_rowCount, &m_colCount);
 
-    m_values = new float*[m_rowCount];
-    for(int i = 0; i < m_rowCount; ++i)
+    m_values = new float* [m_rowCount];
+    for (int i = 0; i < m_rowCount; ++i)
     {
         m_values[i] = new float[m_colCount];
-        for(int j = 0; j < m_colCount; ++j)
+        for (int j = 0; j < m_colCount; ++j)
             m_values[i][j] = mat[i][j];
     }
 }
 
 // Copy assignment operator
-Matrix& Matrix::operator=(Matrix& mat)
+Matrix& Matrix::operator=(Matrix const& mat)
 {
     mat.getSize(&m_rowCount, &m_colCount);
 
-    m_values = new float*[m_rowCount];
-    for(int i = 0; i < m_rowCount; ++i)
+    float** matVals = mat._getArray();
+
+    m_values = new float* [m_rowCount];
+    for (int i = 0; i < m_rowCount; ++i)
     {
         m_values[i] = new float[m_colCount];
-        for(int j = 0; j < m_colCount; ++j)
-            m_values[i][j] = mat[i][j];
+        for (int j = 0; j < m_colCount; ++j)
+            m_values[i][j] = matVals[i][j];
     }
 
     return *this;
 }
 
 // Move constructor
-Matrix::Matrix(Matrix&& mat)
+Matrix::Matrix(Matrix&& mat) noexcept
 {
     mat.getSize(&m_rowCount, &m_colCount);
 
-    m_values = new float*[m_rowCount];
-    for(int i = 0; i < m_rowCount; ++i)
+    m_values = new float* [m_rowCount];
+    for (int i = 0; i < m_rowCount; ++i)
     {
         m_values[i] = new float[m_colCount];
-        for(int j = 0; j < m_colCount; ++j)
+        for (int j = 0; j < m_colCount; ++j)
         {
             m_values[i][j] = mat[i][j];
             mat[i][j] = 0.0f;
@@ -72,15 +74,15 @@ Matrix::Matrix(Matrix&& mat)
 }
 
 // Move assignment operator
-Matrix& Matrix::operator=(Matrix&& mat)
+Matrix& Matrix::operator=(Matrix&& mat) noexcept
 {
     mat.getSize(&m_rowCount, &m_colCount);
 
-    m_values = new float*[m_rowCount];
-    for(int i = 0; i < m_rowCount; ++i)
+    m_values = new float* [m_rowCount];
+    for (int i = 0; i < m_rowCount; ++i)
     {
         m_values[i] = new float[m_colCount];
-        for(int j = 0; j < m_colCount; ++j)
+        for (int j = 0; j < m_colCount; ++j)
         {
             m_values[i][j] = mat[i][j];
             mat[i][j] = 0.0f;
@@ -99,8 +101,8 @@ Matrix Matrix::transposed()
 {
     // transposing is just switching the columns and rows
     Matrix m(m_colCount, m_rowCount);
-    for(int y = 0; y < m_rowCount; ++y)
-        for(int x = 0; x < m_colCount; ++x)
+    for (int y = 0; y < m_rowCount; ++y)
+        for (int x = 0; x < m_colCount; ++x)
             m[x][y] = m_values[y][x];
     return m;
 }
@@ -108,16 +110,16 @@ Matrix Matrix::transposed()
 Matrix Matrix::product(Matrix& mat)
 {
     // matrices must match columns/rows
-    if(mat.getRows() != m_colCount)
+    if (mat.getRows() != m_colCount)
         return *this;
 
     Matrix m(m_rowCount, mat.getColumns());
-    for(int i = 0; i < m.getRows(); ++i)
+    for (int i = 0; i < m.getRows(); ++i)
     {
-        for(int j = 0; j < m.getColumns(); ++j)
+        for (int j = 0; j < m.getColumns(); ++j)
         {
             float sum = 0.0f;
-            for(int k = 0; k < m_colCount; ++k)
+            for (int k = 0; k < m_colCount; ++k)
                 sum += (m_values[i][k] * mat[k][j]);
             m[i][j] = sum;
         }
@@ -127,8 +129,8 @@ Matrix Matrix::product(Matrix& mat)
 
 void Matrix::map(ModifyFunction func)
 {
-    for(int y = 0; y < m_rowCount; ++y)
-        for(int x = 0; x < m_colCount; ++x)
+    for (int y = 0; y < m_rowCount; ++y)
+        for (int x = 0; x < m_colCount; ++x)
             m_values[y][x] = func(m_values[y][x]);
 }
 
@@ -136,8 +138,8 @@ Matrix Matrix::operator*(float mul)
 {
     Matrix m(m_rowCount, m_colCount);
 
-    for(int y = 0; y < m_rowCount; ++y)
-        for(int x = 0; x < m_colCount; ++x)
+    for (int y = 0; y < m_rowCount; ++y)
+        for (int x = 0; x < m_colCount; ++x)
             m[y][x] = m_values[y][x] * mul;
 
     return m;
@@ -145,8 +147,8 @@ Matrix Matrix::operator*(float mul)
 
 Matrix& Matrix::operator*=(float mul)
 {
-    for(int y = 0; y < m_rowCount; ++y)
-        for(int x = 0; x < m_colCount; ++x)
+    for (int y = 0; y < m_rowCount; ++y)
+        for (int x = 0; x < m_colCount; ++x)
             m_values[y][x] *= mul;
     return *this;
 }
@@ -155,8 +157,8 @@ Matrix Matrix::operator+(float num)
 {
     Matrix m(m_rowCount, m_colCount);
 
-    for(int y = 0; y < m_rowCount; ++y)
-        for(int x = 0; x < m_colCount; ++x)
+    for (int y = 0; y < m_rowCount; ++y)
+        for (int x = 0; x < m_colCount; ++x)
             m[y][x] = m_values[y][x] + num;
 
     return m;
@@ -164,24 +166,24 @@ Matrix Matrix::operator+(float num)
 
 Matrix& Matrix::operator+=(float num)
 {
-    for(int y = 0; y < m_rowCount; ++y)
-        for(int x = 0; x < m_colCount; ++x)
+    for (int y = 0; y < m_rowCount; ++y)
+        for (int x = 0; x < m_colCount; ++x)
             m_values[y][x] += num;
     return *this;
 }
 
 Matrix Matrix::operator+(Matrix& mat)
 {
-    if(mat.getRows() != m_rowCount
-            || mat.getColumns() != m_colCount)
+    if (mat.getRows() != m_rowCount
+        || mat.getColumns() != m_colCount)
     {
         // columns and rows don't match
         return *this;
     }
 
     Matrix m(m_rowCount, m_colCount);
-    for(int y = 0; y < m_rowCount; ++y)
-        for(int x = 0; x < m_colCount; ++x)
+    for (int y = 0; y < m_rowCount; ++y)
+        for (int x = 0; x < m_colCount; ++x)
             m[y][x] = m_values[y][x] + mat[y][x];
 
     return m;
@@ -189,15 +191,15 @@ Matrix Matrix::operator+(Matrix& mat)
 
 Matrix& Matrix::operator+=(Matrix& mat)
 {
-    if(mat.getRows() != m_rowCount
-       || mat.getColumns() != m_colCount)
+    if (mat.getRows() != m_rowCount
+        || mat.getColumns() != m_colCount)
     {
         // columns and rows don't match
         return *this;
     }
 
-    for(int y = 0; y < m_rowCount; ++y)
-        for(int x = 0; x < m_colCount; ++x)
+    for (int y = 0; y < m_rowCount; ++y)
+        for (int x = 0; x < m_colCount; ++x)
             m_values[y][x] += mat[y][x];
 
     return *this;
@@ -205,16 +207,16 @@ Matrix& Matrix::operator+=(Matrix& mat)
 
 Matrix Matrix::operator-(Matrix& mat)
 {
-    if(mat.getRows() != m_rowCount
-       || mat.getColumns() != m_colCount)
+    if (mat.getRows() != m_rowCount
+        || mat.getColumns() != m_colCount)
     {
         // columns and rows don't match
         return *this;
     }
 
     Matrix m(m_rowCount, m_colCount);
-    for(int y = 0; y < m_rowCount; ++y)
-        for(int x = 0; x < m_colCount; ++x)
+    for (int y = 0; y < m_rowCount; ++y)
+        for (int x = 0; x < m_colCount; ++x)
             m[y][x] = m_values[y][x] - mat[y][x];
 
     return m;
@@ -222,15 +224,15 @@ Matrix Matrix::operator-(Matrix& mat)
 
 Matrix& Matrix::operator-=(Matrix& mat)
 {
-    if(mat.getRows() != m_rowCount
-       || mat.getColumns() != m_colCount)
+    if (mat.getRows() != m_rowCount
+        || mat.getColumns() != m_colCount)
     {
         // columns and rows don't match
         return *this;
     }
 
-    for(int y = 0; y < m_rowCount; ++y)
-        for(int x = 0; x < m_colCount; ++x)
+    for (int y = 0; y < m_rowCount; ++y)
+        for (int x = 0; x < m_colCount; ++x)
             m_values[y][x] -= mat[y][x];
 
     return *this;
@@ -238,16 +240,16 @@ Matrix& Matrix::operator-=(Matrix& mat)
 
 Matrix Matrix::operator*(Matrix& mat)
 {
-    if(mat.getRows() != m_rowCount
-       || mat.getColumns() != m_colCount)
+    if (mat.getRows() != m_rowCount
+        || mat.getColumns() != m_colCount)
     {
         // columns and rows don't match
         return *this;
     }
 
     Matrix m(m_rowCount, m_colCount);
-    for(int y = 0; y < m_rowCount; ++y)
-        for(int x = 0; x < m_colCount; ++x)
+    for (int y = 0; y < m_rowCount; ++y)
+        for (int x = 0; x < m_colCount; ++x)
             m[y][x] = m_values[y][x] * mat[y][x];
 
     return m;
@@ -255,15 +257,15 @@ Matrix Matrix::operator*(Matrix& mat)
 
 Matrix& Matrix::operator*=(Matrix& mat)
 {
-    if(mat.getRows() != m_rowCount
-       || mat.getColumns() != m_colCount)
+    if (mat.getRows() != m_rowCount
+        || mat.getColumns() != m_colCount)
     {
         // columns and rows don't match
         return *this;
     }
 
-    for(int y = 0; y < m_rowCount; ++y)
-        for(int x = 0; x < m_colCount; ++x)
+    for (int y = 0; y < m_rowCount; ++y)
+        for (int x = 0; x < m_colCount; ++x)
             m_values[y][x] *= mat[y][x];
 
     return *this;
@@ -271,16 +273,16 @@ Matrix& Matrix::operator*=(Matrix& mat)
 
 bool Matrix::operator==(Matrix& mat)
 {
-    if(mat.getRows() != m_rowCount
-       || mat.getColumns() != m_colCount)
+    if (mat.getRows() != m_rowCount
+        || mat.getColumns() != m_colCount)
     {
         // columns and rows don't match
         return false;
     }
 
-    for(int y = 0; y < m_rowCount; ++y)
-        for(int x = 0; x < m_colCount; ++x)
-            if(m_values[y][x] != mat[y][x])
+    for (int y = 0; y < m_rowCount; ++y)
+        for (int x = 0; x < m_colCount; ++x)
+            if (m_values[y][x] != mat[y][x])
                 return false;
 
     return true;
@@ -288,16 +290,16 @@ bool Matrix::operator==(Matrix& mat)
 
 bool Matrix::equal(Matrix& mat, float err)
 {
-    if(mat.getRows() != m_rowCount
-       || mat.getColumns() != m_colCount)
+    if (mat.getRows() != m_rowCount
+        || mat.getColumns() != m_colCount)
     {
         // columns and rows don't match
         return false;
     }
 
-    for(int y = 0; y < m_rowCount; ++y)
-        for(int x = 0; x < m_colCount; ++x)
-            if(absf(m_values[y][x] - mat[y][x]) > err)
+    for (int y = 0; y < m_rowCount; ++y)
+        for (int x = 0; x < m_colCount; ++x)
+            if (absf(m_values[y][x] - mat[y][x]) > err)
                 return false;
 
     return true;
@@ -305,8 +307,8 @@ bool Matrix::equal(Matrix& mat, float err)
 
 void Matrix::randomize()
 {
-    for(int y = 0; y < m_rowCount; ++y)
-        for(int x = 0; x < m_colCount; ++x)
+    for (int y = 0; y < m_rowCount; ++y)
+        for (int x = 0; x < m_colCount; ++x)
             m_values[y][x] = randBetween(-1.0f, 1.0f);
 }
 
@@ -315,5 +317,12 @@ Matrix::Matrix()
 {
     m_rowCount = 1;
     m_colCount = 1;
+}
 
+void Matrix::mutate(float rate)
+{
+    for (int y = 0; y < m_rowCount; ++y)
+        for (int x = 0; x < m_colCount; ++x)
+            if (randBetween(0.0f, 1.0f) < rate)
+                m_values[y][x] = randBetween(-1.0f, 1.0f);
 }

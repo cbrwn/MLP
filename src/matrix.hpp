@@ -17,11 +17,11 @@ public:
 
     // copy constructors
     Matrix(Matrix& mat);
-    Matrix& operator=(Matrix& mat);
+    Matrix& operator=(Matrix const& mat);
 
     // move constructors
-    Matrix(Matrix&& mat);
-    Matrix& operator=(Matrix&& mat);
+    Matrix(Matrix&& mat) noexcept;
+    Matrix& operator=(Matrix&& mat) noexcept;
 
     /***
      * @brief Allows indexing the matrix's values directly
@@ -72,6 +72,7 @@ public:
      * @brief Gives each element in the matrix a random value between -1 and 1
      */
     void randomize();
+    void mutate(float rate);
 
     // scalar operations
     /***
@@ -155,6 +156,13 @@ public:
      * @return Whether or not the matrices are about equal
      */
     bool equal(Matrix& mat, float err);
+
+    /***
+     * @brief Gets the array in which values are stored
+     *          Shouldn't be used, use subscript operator instead
+     * @return 2D float array contining all values
+     */
+    inline float** _getArray() const { return m_values; }
 
 private:
     // values to keep track of the size
