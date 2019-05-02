@@ -105,7 +105,7 @@ void NeuralNetwork::propagate(float const* inputs, float const* targets)
     // just feedforward (like the guess function) but keep track of layers
     // I should probably put this feedforward stuff into a function and
     //  use that for both this and guessing
-    Matrix allLayers[m_hiddenLayers+1];
+    Matrix* allLayers = new Matrix[m_hiddenLayers+1];
     Matrix lastLayer = inputMatrix;
     for(int i = 0; i < m_hiddenLayers+1; ++i)
     {
@@ -151,6 +151,8 @@ void NeuralNetwork::propagate(float const* inputs, float const* targets)
         // base the next layer's error on this layer's error
         error = weightTrans.product(error);
     }
+
+	delete[] allLayers;
 }
 
 bool NeuralNetwork::save(const char* filename)
